@@ -1,6 +1,6 @@
 
-#define __TEST_ECC_P256__
-//#define __AUTO_TEST_ECC_P256__
+//#define __TEST_ECC_P256__
+#define __AUTO_TEST_ECC_P256__
 
 #include <NTL/ZZ.h>
 #include "FHEContext.h"
@@ -18,7 +18,7 @@
 #include "elliptic_curve.hpp"
 
 int main() {
-#ifdef __AUTO_TEST_ECDSA_P256__
+#ifdef __AUTO_TEST_ECC_P256__
 	for (unsigned wndw = 8; wndw < 256; wndw*=2) {
 		unsigned hght_max = 0;
 		while ((256/wndw)>>(++hght_max) > 0);
@@ -33,12 +33,10 @@ int main() {
 			ZZX pG_x = to_ZZX(G_x);
 			ZZX pG_y = to_ZZX(G_y);
 			ZZX pG_z = to_ZZX(G_z);
-			ZZX pG_t = to_ZZX(G_t);
 
 			Ctxt* cG_x[256];
 			Ctxt* cG_y[256];
 			Ctxt* cG_z[256];
-			Ctxt* cG_t[256];
 
 			ECPoint* eG[256];
 
@@ -82,7 +80,6 @@ int main() {
 				cG_x[i] = new Ctxt(publicKey);
 				cG_y[i] = new Ctxt(publicKey);
 				cG_z[i] = new Ctxt(publicKey);
-				cG_t[i] = new Ctxt(publicKey);
 			}
 
 			cout << "===========================" << endl
@@ -115,9 +112,9 @@ int main() {
 			/*
 			 * Precomputation
 			 */
-			ECPrecomputation precomputation_encrypted;
+			ECPrecomputationEncrypted precomputation_encrypted(context);
 			for(long i = 0; i < 256/wndw; i++) {
-				eG[i] = new ECPoint(*cG_x[i], *cG_y[i], *cG_z[i], *cG_t[i], publicKey);
+				eG[i] = new ECPoint(*cG_x[i], *cG_y[i], *cG_z[i], publicKey);
 			}
 
 
@@ -198,7 +195,7 @@ int main() {
 			     << "  Size:      " << context.logOfProduct(eG[0]->X->getPrimeSet())/log(2)/1000000.*context.zMStar.getPhiM()*((double)(256/wndw/(k/2)))*6. << " Mb" << endl
 			     << "  Rate:      " << (context.logOfProduct(eG[0]->X->getPrimeSet())/log(2)/1000000.*context.zMStar.getPhiM())*((double)(256/wndw/(k/2)))*6./texe << " Mbps" << endl
 			     << "===========================" << endl;
-#ifdef __AUTO_TEST_ECDSA_P256__
+#ifdef __AUTO_TEST_ECC_P256__
 		}
 	}
 #endif
